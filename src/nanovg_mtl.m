@@ -434,7 +434,7 @@ static void mtlnvg__xformToMat3x3(matrix_float3x3* m3, float* t) {
                             (vector_float3){t[4], t[5], 1.0f});
 }
 
-NVGcontext* nvgCreateMTL(void* metalLayer, int flags) {
+NVGcontext* nvgCreateMTL(void* metalLayer, void *commandQueue, int flags) {
 #if TARGET_OS_SIMULATOR == 1
   printf("Metal is not supported for iPhone Simulator.\n");
   return NULL;
@@ -471,6 +471,7 @@ NVGcontext* nvgCreateMTL(void* metalLayer, int flags) {
 #endif
   mtl.indexSize = 4;  // MTLIndexTypeUInt32
   mtl.metalLayer = (__bridge CAMetalLayer*)metalLayer;
+  mtl.commandQueue = (__bridge id<MTLCommandQueue>) commandQueue;
 
   ctx = nvgCreateInternal(&params);
   if (ctx == NULL) goto error;
@@ -528,11 +529,6 @@ void mnvgClearWithColor(NVGcontext* ctx, NVGcolor color) {
                                      (float)color.b * alpha,
                                      (float)color.a);
   mtl.clearBufferOnFlush = YES;
-}
-
-void* mnvgCommandQueue(NVGcontext* ctx) {
-  MNVGcontext* mtl = (__bridge MNVGcontext*)nvgInternalParams(ctx)->userPtr;
-  return (__bridge void*)mtl.commandQueue;
 }
 
 int mnvgCreateImageFromHandle(NVGcontext* ctx, void* textureId, int imageFlags) {
@@ -990,8 +986,6 @@ void mnvgReadPixels(NVGcontext* ctx, int image, int x, int y, int width,
   } else {
     _fragmentFunction = [library newFunctionWithName:@"fragmentShader"];
   }
-
-  _commandQueue = [device newCommandQueue];
 
   // Initializes the number of available buffers.
   if (_flags & NVG_TRIPLE_BUFFER) {

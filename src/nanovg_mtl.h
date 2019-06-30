@@ -62,7 +62,7 @@ typedef struct MNVGframebuffer MNVGframebuffer;
 // Creates a new NanoVG context. The `metalLayer` parameter should be a
 // `CAMetalLayer` object, and the `flags` should be combination of
 // `NVGcreateFlags` above.
-NVGcontext* nvgCreateMTL(void* metalLayer, int flags);
+NVGcontext* nvgCreateMTL(void* metalLayer, void *commandQueue, int flags);
 
 // Deletes the specified NanoVG context.
 void nvgDeleteMTL(NVGcontext* ctx);
@@ -87,9 +87,6 @@ void mnvgDeleteFramebuffer(MNVGframebuffer* framebuffer);
 
 // Clear context on next frame, must be called before nvgEndFrame
 void mnvgClearWithColor(NVGcontext* ctx, NVGcolor color);
-
-// Returns a pointer to the corresponded `id<MTLCommandQueue>` object.
-void* mnvgCommandQueue(NVGcontext* ctx);
 
 // Creates an image id from a `id<MTLTexture>` object pointer.
 int mnvgCreateImageFromHandle(NVGcontext* ctx, void* textureId, int imageFlags);
