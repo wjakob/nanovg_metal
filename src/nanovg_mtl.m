@@ -152,7 +152,7 @@ typedef struct MNVGfragUniforms MNVGfragUniforms;
 @property (nonatomic, strong) id<MTLCommandQueue> commandQueue;
 @property (nonatomic, strong) CAMetalLayer* metalLayer;
 @property (nonatomic, strong) id <MTLRenderCommandEncoder> renderEncoder;
-@property (nonatomic, strong) id <CAMetalDrawable> drawable;
+@property (nonatomic, strong) id <MTLTexture> colorTexture;
 
 @property (nonatomic, assign) int fragSize;
 @property (nonatomic, assign) int indexSize;
@@ -532,9 +532,9 @@ void mnvgClearWithColor(NVGcontext* ctx, NVGcolor color) {
   mtl.clearBufferOnFlush = YES;
 }
 
-void mnvgSetDrawable(NVGcontext* ctx, void *drawable) {
+void mnvgSetColorTexture(NVGcontext* ctx, void *colorTexture) {
   MNVGcontext* mtl = (__bridge MNVGcontext*)nvgInternalParams(ctx)->userPtr;
-  mtl.drawable = (__bridge id<CAMetalDrawable>) drawable;
+  mtl.colorTexture = (__bridge id<MTLTexture>) colorTexture;
 }
 
 int mnvgCreateImageFromHandle(NVGcontext* ctx, void* textureId, int imageFlags) {
@@ -1370,7 +1370,7 @@ error:
   }
 
   id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
-  id<MTLTexture> colorTexture = nil;;
+  id<MTLTexture> colorTexture = _colorTexture;
   vector_uint2 textureSize;
 
   _buffers->commandBuffer = commandBuffer;
@@ -1400,8 +1400,8 @@ error:
   if (textureSize.x == 0 || textureSize.y == 0) return;
   [self updateStencilTextureToSize:&textureSize];
 
-  id<CAMetalDrawable> drawable = _drawable;
-  if (colorTexture == nil && drawable == nil)
+  id<CAMetalDrawable> drawable = nil;
+  if (colorTexture == nil)
     drawable = _metalLayer.nextDrawable;
   if (colorTexture == nil && drawable != nil)
     colorTexture = drawable.texture;

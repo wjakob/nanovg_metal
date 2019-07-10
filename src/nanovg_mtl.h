@@ -94,8 +94,8 @@ int mnvgCreateImageFromHandle(NVGcontext* ctx, void* textureId, int imageFlags);
 // Returns a pointer to the corresponded `id<MTLDevice>` object.
 void* mnvgDevice(NVGcontext* ctx);
 
-// Optional: set the target drawable
-void mnvgSetDrawable(NVGcontext* ctx, void *drawable);
+// Optional: set the target color texture
+void mnvgSetColorTexture(NVGcontext* ctx, void *texture);
 
 // Returns a pointer to the `id<MTLTexture>` object of the specified image.
 void* mnvgImageHandle(NVGcontext* ctx, int image);
