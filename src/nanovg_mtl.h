@@ -94,6 +94,9 @@ int mnvgCreateImageFromHandle(NVGcontext* ctx, void* textureId, int imageFlags);
 // Returns a pointer to the corresponded `id<MTLDevice>` object.
 void* mnvgDevice(NVGcontext* ctx);
 
+/// Wait until the command queue has been processed
+void mnvgSetFlushWait(NVGcontext* ctx, int value);
+
 // Optional: set the target color texture
 void mnvgSetColorTexture(NVGcontext* ctx, void *texture);
 

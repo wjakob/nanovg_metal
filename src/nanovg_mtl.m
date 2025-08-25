@@ -160,6 +160,7 @@ typedef struct MNVGfragUniforms MNVGfragUniforms;
 @property (nonatomic, assign) vector_uint2 viewPortSize;
 @property (nonatomic, assign) MTLClearColor clearColor;
 @property (nonatomic, assign) BOOL clearBufferOnFlush;
+@property (nonatomic, assign) BOOL flushWait;
 
 // Textures
 @property (nonatomic, strong) NSMutableArray<MNVGtexture*>* textures;
@@ -473,6 +474,7 @@ NVGcontext* nvgCreateMTL(void* metalLayer, void *commandQueue, int flags) {
   mtl.indexSize = 4;  // MTLIndexTypeUInt32
   mtl.metalLayer = (__bridge CAMetalLayer*)metalLayer;
   mtl.commandQueue = (__bridge id<MTLCommandQueue>) commandQueue;
+  mtl.flushWait = NO;
 
   ctx = nvgCreateInternal(&params);
   if (ctx == NULL) goto error;
@@ -535,6 +537,11 @@ void mnvgClearWithColor(NVGcontext* ctx, NVGcolor color) {
 void mnvgSetColorTexture(NVGcontext* ctx, void *colorTexture) {
   MNVGcontext* mtl = (__bridge MNVGcontext*)nvgInternalParams(ctx)->userPtr;
   mtl.colorTexture = (__bridge id<MTLTexture>) colorTexture;
+}
+
+void mnvgSetFlushWait(NVGcontext* ctx, int value) {
+  MNVGcontext* mtl = (__bridge MNVGcontext*)nvgInternalParams(ctx)->userPtr;
+  mtl.flushWait = value;
 }
 
 int mnvgCreateImageFromHandle(NVGcontext* ctx, void* textureId, int imageFlags) {
@@ -1439,6 +1446,8 @@ error:
 #endif
 
   [_buffers->commandBuffer commit];
+  if (_flushWait)
+      [_buffers->commandBuffer waitUntilCompleted];
 }
 
 - (int)renderGetTextureSizeForImage:(int)image
