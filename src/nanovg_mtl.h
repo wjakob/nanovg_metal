@@ -93,6 +93,8 @@ void mnvgDeleteFramebuffer(MNVGframebuffer* framebuffer);
 // Metal bridging functions
 //
 
+void mnvgSetColorTexture(NVGcontext* ctx, void *colorTexture);
+
 // Clear context on next frame, must be called before nvgEndFrame
 void mnvgClearWithColor(NVGcontext* ctx, NVGcolor color);
 

@@ -148,6 +148,7 @@ typedef struct MNVGfragUniforms MNVGfragUniforms;
 @property (nonatomic, strong) id<MTLCommandQueue> commandQueue;
 @property (nonatomic, strong) CAMetalLayer* metalLayer;
 @property (nonatomic, strong) id <MTLRenderCommandEncoder> renderEncoder;
+@property (nonatomic, strong) id <MTLTexture> colorTexture;
 
 @property (nonatomic, assign) int fragSize;
 @property (nonatomic, assign) int indexSize;
@@ -493,6 +494,11 @@ static void mtlnvg__vset(NVGvertex* vtx, float x, float y, float u, float v) {
 
 void nvgDeleteMTL(NVGcontext* ctx) {
   nvgDeleteInternal(ctx);
+}
+
+void mnvgSetColorTexture(NVGcontext* ctx, void *colorTexture) {
+  MNVGcontext* mtl = (__bridge MNVGcontext*)nvgInternalParams(ctx)->userPtr;
+  mtl.colorTexture = (__bridge id<MTLTexture>) colorTexture;
 }
 
 void mnvgBindFramebuffer(MNVGframebuffer* framebuffer) {
@@ -1411,7 +1417,7 @@ error:
   }
 
   id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
-  id<MTLTexture> colorTexture = nil;;
+  id<MTLTexture> colorTexture = _colorTexture;
   vector_uint2 textureSize;
 
   _buffers.commandBuffer = commandBuffer;
