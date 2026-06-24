@@ -1441,17 +1441,20 @@ error:
     buffers.image = s_framebuffer->image;
     MNVGtexture* tex = [self findTexture:s_framebuffer->image];
     colorTexture = tex->tex;
-    textureSize = (vector_uint2){(uint)colorTexture.width,
-                                 (uint)colorTexture.height};
   }
-  if (textureSize.x == 0 || textureSize.y == 0) return;
-  [self updateStencilTextureToSize:&textureSize];
 
   id<CAMetalDrawable> drawable = nil;
   if (colorTexture == nil) {
     drawable = _metalLayer.nextDrawable;
     colorTexture = drawable.texture;
   }
+  if (colorTexture != nil) {
+    textureSize = (vector_uint2){(uint)colorTexture.width,
+                                 (uint)colorTexture.height};
+  }
+  if (textureSize.x == 0 || textureSize.y == 0) return;
+  [self updateStencilTextureToSize:&textureSize];
+
   _renderEncoder = [self renderCommandEncoderWithColorTexture:colorTexture];
   if (_renderEncoder == nil) {
     return;
